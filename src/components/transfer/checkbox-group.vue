@@ -1,15 +1,15 @@
 <template>
   <div class="checkbox-group">
     <div class="header">
-      <slot name="header">
-        <!-- <span>卡片名称</span> -->
-      </slot>
       <el-checkbox
+        class="checkall"
         :indeterminate="isIndeterminate"
         v-model="isCheckAll"
         @change="handleCheckAllChange"
-        >{{ title }}</el-checkbox
       >
+        {{ title }}
+        <span>{{ summary }}</span>
+      </el-checkbox>
     </div>
     <el-input
       v-if="allowSearch"
@@ -79,6 +79,11 @@ export default {
       default: () => ({}),
     },
     vertical: Boolean,
+    format: {
+      // 例如：'checked/total' , checked 表示选中的量，total表示总量
+      type: String,
+      default: 'checked/total'
+    },
   },
   data() {
     return {
@@ -97,6 +102,11 @@ export default {
       set(val) {
         this.$emit("change", val);
       },
+    },
+    summary() {
+      return this.format
+        .replace("checked", this.checkList.length)
+        .replace("total", this.dataSource.length);
     },
     data() {
       if (this.allowSearch && this.query) {
@@ -162,9 +172,9 @@ export default {
     async handleCheckAllChange(checked) {
       this.isIndeterminate = false;
       if (checked) {
-        this.loading = true
+        this.loading = true;
         this.checkList = Object.freeze(await this.getAllValues());
-        this.loading = false
+        this.loading = false;
       } else {
         if (this.cancelGetAllValues) {
           this.cancelGetAllValues();
@@ -198,7 +208,7 @@ export default {
   flex-direction: column;
   text-align: left;
 }
-.checkbox-vertical /deep/ .el-checkbox {
+.checkbox-vertical >>> .el-checkbox {
   line-height: 30px;
 }
 .header {
@@ -212,6 +222,22 @@ export default {
   border-bottom: 1px solid #ebeef5;
   box-sizing: border-box;
   color: #000;
+}
+.checkall {
+  position: relative;
+  width: 100%;
+}
+.checkall >>> .el-checkbox__label {
+  font-size: 16px;
+  color: #303133;
+  font-weight: 400;
+}
+.checkall >>> .el-checkbox__label span {
+  position: absolute;
+  right: 15px;
+  color: #909399;
+  font-size: 12px;
+  font-weight: 400;
 }
 .body {
   position: relative;

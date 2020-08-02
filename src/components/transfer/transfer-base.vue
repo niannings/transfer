@@ -87,8 +87,8 @@ export default {
       const f = cloned[from];
       const t = cloned[to];
       const fromList = [];
-      let key;
       let toList = [];
+      let key;
       if (f.list.length > 20000) {
         const theFilter = filterBigData(f.list, (item) => {
           key = item[keyName] || item;

@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     fillData() {
-      this.data = fakeData(this.n);
+      this.data = fakeData(this.n | 0);
     }
   },
   components: {
