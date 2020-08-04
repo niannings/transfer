@@ -29,30 +29,36 @@
         @change="handleCheckedChange"
       >
         <template v-if="props">
-          <el-checkbox
-            v-for="item in listData"
-            :key="item[props.key]"
-            :label="item[props.key]"
-            :disabled="item[props.disabled]"
-          >
-            {{ item[props.label] }}
-          </el-checkbox>
+          <template v-if="props.format">
+            <el-checkbox
+              v-for="item in listData"
+              :key="item[props.key]"
+              :label="item[props.key]"
+              :disabled="item[props.disabled]"
+            >{{ compileStringTemplate(props.format, item) }}</el-checkbox>
+          </template>
+          <template v-else>
+            <el-checkbox
+              v-for="item in listData"
+              :key="item[props.key]"
+              :label="item[props.key]"
+              :disabled="item[props.disabled]"
+            >{{ item[props.label] }}</el-checkbox>
+          </template>
         </template>
         <template v-else>
-          <el-checkbox v-for="item in listData" :key="item" :label="item">
-            {{ item }}
-          </el-checkbox>
+          <el-checkbox v-for="item in listData" :key="item" :label="item">{{ item }}</el-checkbox>
         </template>
         <span v-scroll-load="{ data, size: 20, onChange }"></span>
       </el-checkbox-group>
     </div>
     <!-- <pre style="text-align: left">value: {{JSON.stringify(checkList, null, 2)}}</pre>
-      <pre style="text-align: left">data: {{JSON.stringify(data, null, 2)}}</pre> -->
+    <pre style="text-align: left">data: {{JSON.stringify(data, null, 2)}}</pre>-->
   </div>
 </template>
 
 <script>
-import { eachBigData } from "./utils";
+import { eachBigData, compileStringTemplate } from "./utils";
 
 export default {
   model: {
@@ -82,7 +88,7 @@ export default {
     format: {
       // 例如：'checked/total' , checked 表示选中的量，total表示总量
       type: String,
-      default: 'checked/total'
+      default: "checked/total",
     },
   },
   data() {
@@ -110,6 +116,15 @@ export default {
     },
     data() {
       if (this.allowSearch && this.query) {
+        const format = this.props.format;
+        if (format) {
+          return this.dataSource.filter(
+            (item) =>
+              compileStringTemplate(format, item)
+                .toLowerCase()
+                .indexOf(this.query.toLowerCase()) > -1
+          );
+        }
         const labelName = this.props.label;
         if (labelName) {
           return this.dataSource.filter(
@@ -134,7 +149,13 @@ export default {
       }
     },
   },
+  beforeDestroy() {
+    if (typeof this.cancelGetAllValues === "function") {
+      this.cancelGetAllValues();
+    }
+  },
   methods: {
+    compileStringTemplate,
     async getAllValues() {
       const keyName = this.props.key;
       const disabledName = this.props.disabled;

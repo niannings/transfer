@@ -1,5 +1,5 @@
 <template>
-  <transfer-base v-model="data" :props="props" @change="handleChange"/>
+  <transfer-base v-model="data" :props="props" @change="handleChange" :loading="$attrs.loading" />
 </template>
 
 <script>
@@ -8,25 +8,25 @@ import TransferBase from "./transfer-base";
 export default {
   model: {
     prop: "value",
-    event: "change"
+    event: "change",
   },
   props: {
     value: Array,
     dataSource: {
       type: Array,
-      required: true
+      required: true,
     },
     props: {
-      default: () => ({})
+      default: () => ({}),
     },
     titles: {
       type: Array,
-      default: () => ["title-1", "title-2"]
+      default: () => ["title-1", "title-2"],
     },
     allowSearch: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   data() {
     return {
@@ -35,14 +35,14 @@ export default {
         {
           title: this.titles[0],
           allowSearch: this.allowSearch,
-          list: []
+          list: [],
         },
         {
           title: this.titles[1],
           allowSearch: this.allowSearch,
-          list: []
-        }
-      ]
+          list: [],
+        },
+      ],
     };
   },
   watch: {
@@ -50,21 +50,23 @@ export default {
       immediate: true,
       handler() {
         this.handOut();
-      }
-    }
+      },
+    },
   },
   methods: {
     handleChange() {
-      const keyName = this.props.key
+      const keyName = this.props.key;
       this.$emit(
         "change",
-        keyName ? this.data[1].list.map(item => item[keyName]) : this.data[1].list
+        keyName
+          ? this.data[1].list.map((item) => item[keyName])
+          : this.data[1].list
       );
     },
     handOut() {
-      const d1 = []
-      const d2 = []
-      this.dataSource.forEach(item => {
+      const d1 = [];
+      const d2 = [];
+      this.dataSource.forEach((item) => {
         if (this.value.includes(item[this.props.key] || item)) {
           d2.push(item);
         } else {
@@ -73,10 +75,10 @@ export default {
       });
       this.data[0].list = Object.freeze(d1);
       this.data[1].list = Object.freeze(d2);
-    }
+    },
   },
   components: {
-    TransferBase
-  }
+    TransferBase,
+  },
 };
 </script>

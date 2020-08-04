@@ -16,14 +16,18 @@ export function scrollLoad(container, loader, config) {
   if (config.immediate) {
     loader()
   }
+  const scrollHandler = throttle(() => {
+    if (checkScrollEnd(container, config.distance)) {
+      loader()
+    }
+  }, config.delay)
   container.addEventListener(
     'scroll',
-    throttle(() => {
-      if (checkScrollEnd(container, config.distance)) {
-        loader()
-      }
-    }, config.delay)
+    scrollHandler
   )
+  return () => {
+    container.removeEventListener('scroll', scrollHandler)
+  }
 }
 
 function checkScrollEnd(
@@ -78,10 +82,10 @@ export function scrollLoadBigData(container, bigData, config) {
       n = 0
       data = chunk(newData, size, n)
       onChange([...data])
-      n++
+      n = 1
     }
   }
-  scrollLoad(
+  result.unbind = scrollLoad(
     container,
     () => {
       if (size * n >= bigData.length) {

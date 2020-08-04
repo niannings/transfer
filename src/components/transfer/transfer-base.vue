@@ -1,8 +1,15 @@
 <template>
-  <div class="wl-transfer-wrap" v-loading="loading">
+  <div
+    class="wl-transfer-wrap"
+    v-loading="spinning"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(255,255,255,.6)"
+  >
     <div class="wl-transfer" v-for="(item, index) in dataSource" :key="index">
       <div class="wl-transfer-buttons" v-if="index !== 0">
         <el-button
+          round
           type="primary"
           size="small"
           :disabled="!values[index - 1].length"
@@ -11,6 +18,7 @@
           <i class="el-icon-arrow-right el-icon--right"></i>
         </el-button>
         <el-button
+          round
           type="primary"
           size="small"
           icon="el-icon-arrow-left"
@@ -56,11 +64,12 @@ export default {
     props: {
       default: () => ({}),
     },
+    loading: Boolean,
   },
   data() {
     return {
       values: [],
-      loading: false,
+      isLoading: false,
     };
   },
   watch: {
@@ -73,6 +82,11 @@ export default {
             .map(() => []);
         }
       },
+    },
+  },
+  computed: {
+    spinning() {
+      return this.loading || this.isLoading;
     },
   },
   beforeDestroy() {
@@ -99,9 +113,9 @@ export default {
         });
         this.cancelTransfer = theFilter.cancel;
         try {
-          this.loading = true;
+          this.isLoading = true;
           toList = await theFilter.future;
-          this.loading = false;
+          this.isLoading = false;
         } catch (error) {
           console.log(error);
         }
@@ -148,10 +162,10 @@ export default {
   margin-top: 20px;
 }
 .group {
-  width: 200px;
+  width: 242px;
 }
 .group /deep/ .el-checkbox-group {
-  max-width: 185px;
+  max-width: 227px;
   margin-left: 15px;
   padding: 6px 0;
   list-style: none;

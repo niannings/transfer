@@ -41,5 +41,10 @@ Vue.directive('scroll-load', {
       const { data, size } = binding.value
       el.$loader.update(data, size)
     }
+  },
+  unbind(el) {
+    if (el.$loader) {
+      el.$loader.unbind()
+    }
   }
 })
